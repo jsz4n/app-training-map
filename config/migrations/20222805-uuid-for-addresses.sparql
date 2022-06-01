@@ -1,0 +1,16 @@
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX locn: <http://www.w3.org/ns/locn#>
+PREFIX mu: <http://mu.semte.ch/vocabularies/core/>
+
+INSERT {
+    GRAPH <http://sem.jsz4n.dev/lblod>{
+        ?addr mu:uuid ?uuid.
+    }
+}
+WHERE {
+    GRAPH <http://sem.jsz4n.dev/lblod> {
+        ?addr rdf:type locn:Address.
+        BIND( STRAFTER(STR(?addr) , "adressen/") AS ?uuid)
+    }
+}
