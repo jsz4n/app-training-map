@@ -1,0 +1,80 @@
+version: "3.7"
+services:
+
+  identifier:
+    image: semtech/mu-identifier:1.9.1
+    environment:
+      SESSION_COOKIE_SECURE: "on"
+      DEFAULT_ACCESS_CONTROL_ALLOW_ORIGIN_HEADER: "*"
+      DEFAULT_MU_AUTH_ALLOWED_GROUPS_HEADER: "[{\"variables\":[],\"name\":\"public\"}]"
+    links:
+      - dispatcher
+    ports:
+      - 80:80
+
+  dispatcher:
+    image: semtech/mu-dispatcher:2.1.0-beta.2
+    volumes:
+      - ./config/dispatcher:/config
+    restart: always
+
+  db:
+    image: semtech/mu-authorization:0.6.0-beta.7
+    volumes:
+      - ./config/authorization:/config
+    # alias the triplestore as database to use default parameters
+    links:
+      - triplestore:database
+
+  triplestore:
+    image: redpencil/virtuoso
+    volumes:
+      - ./data/db:/data
+      - ./config/virtuoso/virtuoso.ini:/data/virtuoso.ini
+    environment:
+      SPARQL_UPDATE: "true"
+      DEFAULT_GRAPH: "http://sem.jsz4n.dev/lblod"
+    ports:
+      - 8890:8890
+
+  yasgui:
+    image: erikap/yasgui
+    environment:
+      ENABLE_ENDPOINT_SELECTOR: "true"
+      DEFAULT_SPARQL_ENDPOINT: "http://localhost/sparql"
+    expose:
+      - "80"
+
+  resources:
+    image: semtech/mu-cl-resources:1.20.0
+    volumes:
+      - ./config/resources:/config
+    environment:
+      MU_APPLICATION_GRAPH: "http://sem.jsz4n.dev/lblod"
+      #MU_APPLICATION_GRAPH: "http://localhost:8890/jsz4nlblod"
+    links: 
+      - db:database
+
+  # TODO: use migration to geocode
+  migrations:
+    image: semtech/mu-migrations-service:0.7.0
+    links:
+      - triplestore:database
+    volumes:
+      - ./config/migrations:/data/migrations
+    environment:
+      MU_APPLICATION_GRAPH: "http://sem.jsz4n.dev/lblod"
+
+
+
+        #  simple-js:
+        #    image: semtech/mu-javascript-template:1.5.0
+        #    # port for debugging open
+        #    ports:
+        #      - 9229:9229
+        #    volumes:
+        #      - ./simple-js/app.js:/app/app.js
+        #    environment:
+        #      NODE_ENV: "development"
+        #    links: 
+        #      - db
