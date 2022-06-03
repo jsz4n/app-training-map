@@ -1,0 +1,23 @@
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX locn: <http://www.w3.org/ns/locn#>
+PREFIX ns2: <https://data.vlaanderen.be/ns/adres#>
+PREFIX mu: <http://mu.semte.ch/vocabularies/core/>
+PREFIX dbpo: <http://dbpedia.org/ontology/>
+PREFIX schema: <http://schema.org/>
+
+
+
+INSERT {
+    GRAPH <http://sem.jsz4n.dev/lblod>{
+        ?s dbpo:City ?s2.
+    }
+}
+WHERE {
+    GRAPH <http://sem.jsz4n.dev/lblod> {
+        ?s a schema:ContactPoint; mu:uuid ?uuid;  ns2:gemeentenaam ?city; locn:fullAddress ?fad.
+        ?s2 a dbpo:City; ns2:gemeentenaam ?city; dbpo:postalCode ?code.
+        BIND( STRBEFORE(STRAFTER(STR(?fad), ", "), " ") as ?code)
+    }
+}

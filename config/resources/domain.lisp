@@ -4,16 +4,13 @@
 (define-resource contactPoint ()
         :class (s-prefix "schema:ContactPoint")
         :properties `(
-                      (:uuid :string ,(s-prefix "mu:uuid"))
                       (:mail :string ,(s-prefix "schema:email"))
                       (:phone :string ,(s-prefix "schema:telephone"))
-                      ;(:address :url ,(s-prefix "locn:address") ) ;:required)
                      )
         :has-one  `(
                      (address :via ,(s-prefix "locn:address") :as "address")
-                    ;(address :via ,(s-prefix "locn:Address") :inverse t  :as "address")
-        ;            ;(city :via ,(s-prefix "ns2:gemeentenaam") :as "city")
                    )
+        :features '(include-uri)
         :on-path "contactpoints")
 
 (define-resource address ()
@@ -22,23 +19,31 @@
                       (:city :string ,(s-prefix "ns2:gemeentenaam"))
                       (:addr :string ,(s-prefix "locn:fullAddress"))
                      )
-       ;has-one `(
-       ;          (city :via ,(s-prefix "ns2:gemeentenaam") as "city")
-       ;         )
-        ;:has-many `(
-                   ;:inverse t
-                   ;(contactPoint :via ,(s-prefix "schema:ContactPoint")
-                   ;                 :as "contactpoint")
-                   ;)
+        :has-one `(
+                  (city :via ,(s-prefix "dbpo:City") :as "citydetails")
+                 )
+        :has-many  `(
+                     (contactPoint :via ,(s-prefix "locn:address")
+                                   :inverse t
+                                   :as "contactpoints")
+                   )
+        :features '(include-uri)
         :on-path "addresses")
+
 (define-resource city ()
         :class (s-prefix "dbpo:City")
         :properties `(
                       (:name :string ,(s-prefix "ns2:gemeentenaam"))
-                      (:postCode :string ,(s-prefix "dbpo:postCode"))
+                      (:postcode :string ,(s-prefix "dbpo:postalCode"))
                       (:lat :string ,(s-prefix "w3cgeo:lat"))
                       (:long :string ,(s-prefix "w3cgeo:long"))
                      )
+        :has-many  `(
+                     (address :via ,(s-prefix "locn:address")
+                                   :inverse t
+                                   :as "addresses")
+                   )
+        :features '(include-uri)
         :on-path "cities")
 
 
