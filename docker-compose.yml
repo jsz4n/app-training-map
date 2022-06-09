@@ -9,6 +9,7 @@ services:
       DEFAULT_MU_AUTH_ALLOWED_GROUPS_HEADER: "[{\"variables\":[],\"name\":\"public\"}]"
     links:
       - dispatcher
+    restart: always
     ports:
       - 80:80
 
@@ -55,7 +56,6 @@ services:
     links: 
       - db:database
 
-  # TODO: use migration to geocode
   migrations:
     image: semtech/mu-migrations-service:0.7.0
     links:
