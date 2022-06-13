@@ -20,3 +20,4 @@ I deployed and configured various services :
 - virtuoso (triplestore)
 - mu-cl-ressource in which I configured the API using the [domain.lisp](https://github.com/jsz4n/app-training-map/blob/main/config/resources/domain.lisp) file
 
+I also tried the mu-javascript-template and mu-python-template, I created simple APIs with them (which are not used in the app).
